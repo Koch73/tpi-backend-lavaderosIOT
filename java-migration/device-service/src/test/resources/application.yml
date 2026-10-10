@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:devices;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+athiel:
+  devices:
+    attempts: 2
+    retry-delay: 0ms
+    confirm-delay: 0ms
+    list:
+      - id: box1
+        vendor: SHELLY_CLOUD
+        external-id: abc123
+        channel: 0
+  shelly:
+    base-url: http://localhost:1
+    auth-key: test
+  tuya:
+    base-url: http://localhost:1
+    client-id: id
+    client-secret: secret

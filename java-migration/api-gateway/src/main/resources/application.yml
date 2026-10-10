@@ -1,0 +1,42 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: false
+      routes:
+        - id: auth
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/login,/me
+        - id: orders
+          uri: ${ORDER_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/create_preference,/settings,/payments/manual,/reports/**,/boxes/**
+        - id: payments
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/webhook,/success,/failure,/pending
+        # device-service has no route on purpose: only order-service reaches it.
+
+athiel:
+  gateway:
+    jwt-secret: ${JWT_SECRET_KEY}
+    # The Python routes that used Depends(get_current_user), plus the box stop
+    # command, which was open to anyone in the Python version.
+    protected-routes:
+      - GET /me
+      - GET /settings
+      - PUT /settings
+      - POST /payments/manual
+      - GET /reports/**
+      - POST /boxes/**

@@ -1,0 +1,33 @@
+server:
+  port: ${PORT:8083}
+
+spring:
+  application:
+    name: device-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/devices_db}
+    username: ${DB_USER:athiel}
+    password: ${DB_PASSWORD:athiel}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+athiel:
+  devices:
+    attempts: 3
+    retry-delay: 2s
+    confirm-delay: 500ms
+    list:
+      # logical id used by order-service ("box1"); external-id is the vendor's device id
+      - id: box1
+        vendor: ${DEVICE_BOX1_VENDOR:SHELLY_CLOUD}
+        external-id: ${DEVICE_BOX1_EXTERNAL_ID}
+        channel: 0
+  shelly:
+    base-url: ${HOST_SHELLY:}
+    auth-key: ${SHELLY_TOKEN:}
+  tuya:
+    base-url: ${TUYA_BASE_URL:}
+    client-id: ${TUYA_CLIENT_ID:}
+    client-secret: ${TUYA_CLIENT_SECRET:}

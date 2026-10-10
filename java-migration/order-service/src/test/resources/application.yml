@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:orders;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+athiel:
+  scheduling:
+    enabled: false
+  wash-device-id: box1
+  device-service-url: http://localhost:1
+  payment-service-url: http://localhost:1
+  shutdown-retry: 0s

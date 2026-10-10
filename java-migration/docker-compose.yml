@@ -1,0 +1,106 @@
+# Only api-gateway publishes a port. device-service, payment-service (except
+# the webhook through the gateway), order-service, auth-service, Postgres and
+# RabbitMQ stay on the internal network.
+x-db: &db
+  DB_USER: athiel
+  DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+
+x-build: &build
+  context: .
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: athiel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U athiel"]
+      interval: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: athiel
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 10
+
+  auth-service:
+    build: { <<: *build, args: { MODULE: auth-service } }
+    environment:
+      <<: *db
+      DB_URL: jdbc:postgresql://postgres:5432/auth_db
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY (32+ chars) in .env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  payment-service:
+    build: { <<: *build, args: { MODULE: payment-service } }
+    environment:
+      <<: *db
+      DB_URL: jdbc:postgresql://postgres:5432/payments_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: athiel
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      MP_ACCESS_TOKEN: ${MP_ACCESS_TOKEN:?set MP_ACCESS_TOKEN in .env}
+      MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET:-}
+      WEBHOOK_URL: ${WEBHOOK_URL:?public URL Mercado Pago can reach}
+      BASE_URL: ${BASE_URL:?public URL of the frontend}
+    depends_on:
+      postgres: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+
+  device-service:
+    build: { <<: *build, args: { MODULE: device-service } }
+    environment:
+      <<: *db
+      DB_URL: jdbc:postgresql://postgres:5432/devices_db
+      DEVICE_BOX1_VENDOR: ${DEVICE_BOX1_VENDOR:-SHELLY_CLOUD}
+      DEVICE_BOX1_EXTERNAL_ID: ${DEVICE_BOX1_EXTERNAL_ID:?vendor device id of box1}
+      HOST_SHELLY: ${HOST_SHELLY:-}
+      SHELLY_TOKEN: ${SHELLY_TOKEN:-}
+      TUYA_BASE_URL: ${TUYA_BASE_URL:-}
+      TUYA_CLIENT_ID: ${TUYA_CLIENT_ID:-}
+      TUYA_CLIENT_SECRET: ${TUYA_CLIENT_SECRET:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  order-service:
+    build: { <<: *build, args: { MODULE: order-service } }
+    environment:
+      <<: *db
+      DB_URL: jdbc:postgresql://postgres:5432/orders_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: athiel
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      DEVICE_SERVICE_URL: http://device-service:8083
+      PAYMENT_SERVICE_URL: http://payment-service:8082
+    depends_on:
+      postgres: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+
+  api-gateway:
+    build: { <<: *build, args: { MODULE: api-gateway } }
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      ORDER_SERVICE_URL: http://order-service:8084
+      PAYMENT_SERVICE_URL: http://payment-service:8082
+    depends_on:
+      - auth-service
+      - order-service
+      - payment-service
+
+volumes:
+  pgdata:

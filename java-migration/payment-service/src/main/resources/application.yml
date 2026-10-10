@@ -1,0 +1,28 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/payments_db}
+    username: ${DB_USER:athiel}
+    password: ${DB_PASSWORD:athiel}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+athiel:
+  mercadopago:
+    access-token: ${MP_ACCESS_TOKEN}
+    base-url: https://api.mercadopago.com
+    webhook-secret: ${MP_WEBHOOK_SECRET:}
+    notification-url: ${WEBHOOK_URL}/webhook
+    back-url: ${BASE_URL}
+    approval-window: 5m

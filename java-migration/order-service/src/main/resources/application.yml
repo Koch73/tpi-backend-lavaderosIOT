@@ -1,0 +1,25 @@
+server:
+  port: ${PORT:8084}
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/orders_db}
+    username: ${DB_USER:athiel}
+    password: ${DB_PASSWORD:athiel}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+athiel:
+  wash-device-id: box1
+  device-service-url: ${DEVICE_SERVICE_URL:http://localhost:8083}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
+  shutdown-retry: 10s
