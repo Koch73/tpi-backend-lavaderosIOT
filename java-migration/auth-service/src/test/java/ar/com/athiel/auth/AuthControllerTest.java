@@ -51,6 +51,15 @@ class AuthControllerTest {
     }
 
     @Test
+    void openApiSpecListsEndpoints() {
+        ResponseEntity<Map> r = rest.getForEntity("/docs/auth/v3/api-docs", Map.class);
+        assertEquals(HttpStatus.OK, r.getStatusCode());
+        Map<?, ?> paths = (Map<?, ?>) r.getBody().get("paths");
+        assertNotNull(paths.get("/login"));
+        assertNotNull(paths.get("/me"));
+    }
+
+    @Test
     void meWithoutTokenIs401() {
         ResponseEntity<Map> r = rest.getForEntity("/me", Map.class);
         assertEquals(HttpStatus.UNAUTHORIZED, r.getStatusCode());

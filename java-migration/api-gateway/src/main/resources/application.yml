@@ -26,7 +26,38 @@ spring:
           uri: ${PAYMENT_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/webhook,/success,/failure,/pending
+        # OpenAPI specs of the public services, aggregated in Swagger UI
+        # (/swagger-ui.html). PreserveHostHeader makes the spec's "servers"
+        # point at the gateway instead of the internal service.
+        - id: docs-auth
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/docs/auth/**
+          filters:
+            - PreserveHostHeader
+        - id: docs-order
+          uri: ${ORDER_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/docs/order/**
+          filters:
+            - PreserveHostHeader
+        - id: docs-payment
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/docs/payment/**
+          filters:
+            - PreserveHostHeader
         # device-service has no route on purpose: only order-service reaches it.
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: auth-service
+        url: /docs/auth/v3/api-docs
+      - name: order-service
+        url: /docs/order/v3/api-docs
+      - name: payment-service
+        url: /docs/payment/v3/api-docs
 
 athiel:
   gateway:

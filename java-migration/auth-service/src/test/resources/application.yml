@@ -13,3 +13,7 @@ athiel:
   admin:
     username: admin
     password: s3cret-test
+
+springdoc:
+  api-docs:
+    path: /docs/auth/v3/api-docs

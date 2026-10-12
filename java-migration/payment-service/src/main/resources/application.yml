@@ -26,3 +26,8 @@ athiel:
     notification-url: ${WEBHOOK_URL}/webhook
     back-url: ${BASE_URL}
     approval-window: 5m
+
+# Served under /docs/payment so the gateway can proxy it without rewriting the path.
+springdoc:
+  api-docs:
+    path: /docs/payment/v3/api-docs

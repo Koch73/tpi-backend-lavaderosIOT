@@ -38,6 +38,13 @@ to be stripped by Nginx, as with FastAPI's `root_path`):
 Errors keep the FastAPI shape `{"detail": "..."}`.
 `POST /create_preference` additionally returns `order_id`.
 
+## API docs (OpenAPI)
+
+Through the gateway: Swagger UI at `http://localhost:8080/swagger-ui.html`
+(dropdown with auth, order and payment services) and raw specs at
+`/docs/auth/v3/api-docs`, `/docs/order/v3/api-docs`, `/docs/payment/v3/api-docs`.
+These routes are public. device-service is internal and has no docs route.
+
 ## Behaviour that changed on purpose
 
 | Python | Java | Why |

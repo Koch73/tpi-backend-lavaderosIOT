@@ -19,3 +19,8 @@ athiel:
   admin:
     username: ${ADMIN_USERNAME:}
     password: ${ADMIN_PASSWORD:}
+
+# Served under /docs/auth so the gateway can proxy it without rewriting the path.
+springdoc:
+  api-docs:
+    path: /docs/auth/v3/api-docs

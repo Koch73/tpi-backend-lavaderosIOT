@@ -23,3 +23,8 @@ athiel:
   device-service-url: ${DEVICE_SERVICE_URL:http://localhost:8083}
   payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
   shutdown-retry: 10s
+
+# Served under /docs/order so the gateway can proxy it without rewriting the path.
+springdoc:
+  api-docs:
+    path: /docs/order/v3/api-docs
