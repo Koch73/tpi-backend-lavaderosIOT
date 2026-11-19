@@ -40,7 +40,7 @@ public class AdminSeeder implements ApplicationRunner {
             log.warn("No users exist and ADMIN_USERNAME / ADMIN_PASSWORD are not set; nobody can log in");
             return;
         }
-        users.save(new User(username, encoder.encode(password)));
+        users.save(new User(username, encoder.encode(password), Role.ADMIN));
         log.info("Admin user '{}' created", username);
     }
 }

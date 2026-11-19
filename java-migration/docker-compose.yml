@@ -1,6 +1,6 @@
-# Only api-gateway publishes a port. device-service, payment-service (except
-# the webhook through the gateway), order-service, auth-service, Postgres and
-# RabbitMQ stay on the internal network.
+# api-gateway publishes 8080 and auth-service publishes 8081. device-service,
+# payment-service (except the webhook through the gateway), order-service,
+# Postgres and RabbitMQ stay on the internal network.
 x-db: &db
   DB_USER: athiel
   DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
@@ -34,6 +34,8 @@ services:
 
   auth-service:
     build: { <<: *build, args: { MODULE: auth-service } }
+    ports:
+      - "8081:8081"
     environment:
       <<: *db
       DB_URL: jdbc:postgresql://postgres:5432/auth_db

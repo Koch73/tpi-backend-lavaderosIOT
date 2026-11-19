@@ -57,7 +57,8 @@ public class AuthController {
         }
         return users.findByUsername(username)
                 .<ResponseEntity<?>>map(u -> ResponseEntity.ok(
-                        Map.of("username", u.getUsername(), "is_active", u.isActive())))
+                        Map.of("username", u.getUsername(), "role", u.getRole().name(),
+                                "is_active", u.isActive())))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("detail", "Usuario inexistente")));
     }

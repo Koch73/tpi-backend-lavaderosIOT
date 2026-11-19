@@ -39,6 +39,7 @@ class AuthControllerTest {
                 new HttpEntity<>(headers), Map.class);
         assertEquals(HttpStatus.OK, me.getStatusCode());
         assertEquals("admin", me.getBody().get("username"));
+        assertEquals("ADMIN", me.getBody().get("role"));
         assertEquals(true, me.getBody().get("is_active"));
     }
 
